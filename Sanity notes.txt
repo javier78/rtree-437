@@ -1,0 +1,46 @@
+Sanity notes:
+
+Hilbert value is a point on the hilbert curve. General idea is that similar tuples will be closer together on the hilbert curve. Use these points to draw bounding boxes that make up the r tree.
+
+These points must first be sorted. Then, we can use the B+ tree bulk loading algorithm to insert these points without the need for heuristics and stuff.
+
+Entries in a page = size of entries/size of page. Page should be stored on disk, but nothing too crazy.
+
+Handling duplicates: read chapter 10.7 in textbook.
+
+Now that I have the hilbert values in sorted order (ascending), we can bulk load the tree. One thing I need to find out: how many entries can fit in a 4K page? size of entries/4096=? What exactly was I given here? 
+
+Important note: fanout is equal to the number of entries in a page. Unlike in B+ trees, where the fanout is 2d+1 (double the order + 1)
+
+On indexing: do NOT index the hilbert value. Index both x and y values.
+
+So: A leaf node is a box, not much to it. The parent node is the MBR of all the nodes contained in the parent. A non-leaf node will contain the dimensions of the rectangle (so, 4 ints). Non-leaf nodes can intersect. Class Rectangle should only act as a container, and it shouldn't know anything about what makes its dimensions. The bounding dimensions should be calculated in the main class. This could be changed later.
+
+Calculating the order: size of entry + size of pointer <= 4096
+=> size of entry*2d + size of pointer*2d <= 4096
+
+Another problem: What exactly does an entry in a leaf node store? Intuition: the leaf node is a collection of points. The leaf node, therefore, can be consideedred an MBR for those points. This may be the last thing I need to implement bulk loading. 
+
+Leaf node entries do not need to keep track of record IDs it seems, since we're using alternative 1.
+
+Number of data points in a leaf node: 
+2 ints = 8 bytes (x & y)
+1 long = 8 bytes (should hilbert even be stored?)
+500 character string = 500 bytes
+total: 516 bytes
+516*2d <= 4096
+d <= 3.968992248
+d = 3
+Max d value: 6 = 2d
+
+Number of indexes in a non-leaf node:
+d<=204<=2d
+
+How pages are stored on disk:
+Have a page "ID", which starts at 0. This ID will be used as file names. In order to avoid parsing, I can utilize the Serializable class as the node is created. Note: I will not be making any updates to this database after it is created, so I will not need to write anything back.
+
+Sanity check:
+-Tuples are data points. They know nothing about their MBR.
+-A node is a collection of rectangles (MBRs), leaf node or not. Calculations will change because of this...
+-Where to store the MBR?
+--Do we need a class "Entry"? Or should it be an interface, with there being two kinds to entries: data and index? Calculating the MBR for a data entry is different compared to finding the MBR for an index entry. 
