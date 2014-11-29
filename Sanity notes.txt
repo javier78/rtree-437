@@ -44,3 +44,9 @@ Sanity check:
 -A node is a collection of rectangles (MBRs), leaf node or not. Calculations will change because of this...
 -Where to store the MBR?
 --Do we need a class "Entry"? Or should it be an interface, with there being two kinds to entries: data and index? Calculating the MBR for a data entry is different compared to finding the MBR for an index entry. 
+
+Calculating the MBR for an index node:
+We need access to the rectangles in the child node.
+
+What to store in an index entry:
+-The current MBR, but not an array of child rectangles
