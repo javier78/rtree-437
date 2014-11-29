@@ -1,0 +1,11 @@
+.classpath
+.project
+bin/pa3/Entry.class
+bin/pa3/IndexNode.class
+bin/pa3/LeafNode.class
+bin/pa3/Node.class
+bin/pa3/NodeReference.class
+bin/pa3/Rectangle.class
+bin/pa3/Tuple.class
+bin/pa3/hilbert.class
+bin/pa3/project3dataset30K-1.txt
