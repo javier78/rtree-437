@@ -9,10 +9,12 @@ public class Entry implements Serializable
 	 */
 	private static final long serialVersionUID = 1864185831524829527L;
 	Rectangle mbr = new Rectangle(0,0,0,0);
-	Rectangle[] containedRectangles; //TODO: Calculate correct number of rectangles!!!
+	Object[] containedDataRegions; //TODO: Calculate correct number of rectangles!!! Don't store this, get the array from another class.
+	NodeReference child;
 	
 	public Rectangle calculateMBR()
 	{
+		containedDataRegions = new Tuple[2];
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
 		int minY = Integer.MAX_VALUE;
