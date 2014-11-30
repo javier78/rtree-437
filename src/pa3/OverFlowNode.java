@@ -19,7 +19,7 @@ public class OverFlowNode extends LeafNode
 		return overflow;
 	}
 
-	public void addTuple(Tuple t)
+	public boolean addTuple(Tuple t)
 	{
 		if(overflow == null)
 		{
@@ -35,6 +35,7 @@ public class OverFlowNode extends LeafNode
 						Node.writeNode(ofn, overflow);
 					}
 					Node.writeNode(this, new NodeReference(id));
+					return true;
 				}
 			}
 		}
@@ -42,6 +43,8 @@ public class OverFlowNode extends LeafNode
 		{
 			OverFlowNode ofn = (OverFlowNode)Node.ReadNode(overflow);
 			ofn.addTuple(t);
+			return true;
 		}
+		return true;
 	}
 }

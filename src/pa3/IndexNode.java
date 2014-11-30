@@ -9,8 +9,7 @@ public class IndexNode extends Node
 	//NodeReference[] refs;
 	Entry[] entries;	//Can access NodeReferences from here, as well as all MBRs, no need to store them again.
 	
-	//Rectangle[] mbr;
-	private final int MAX_ENTRIES = 204;	//Found this value by summing the size of all fields in an index entry and multiplying each size by 2d, where d is the order of the tree.
+	final transient int MAX_ENTRIES = 204;	//Found this value by summing the size of all fields in an index entry and multiplying each size by 2d, where d is the order of the tree.
 	//size of a NodeReference = 4 bytes, size of a Rectangle is 16 bytes (contains 4 integers). Figure out how many entries also fit!!
 	//So: 2d * (4 * 4) + 2d * (4) <= 4096
 	//==>32d + 8d <= 4096
@@ -23,7 +22,7 @@ public class IndexNode extends Node
 		entries = new Entry[MAX_ENTRIES];
 	}
 	
-	public void addIndex(Node child)
+	public boolean addIndex(Node child)
 	{
 		 for(int x = 0; x < entries.length; x++)
 		 {
@@ -31,8 +30,10 @@ public class IndexNode extends Node
 			 {
 				 entries[x] = new Entry(new NodeReference(child.id));
 				 entries[x].calculateMBR(child);
+				 return true;
 			 }
 		 }
+		 return false;
 	}
 	
 	public Rectangle[] getRectangles()
@@ -43,5 +44,15 @@ public class IndexNode extends Node
 			r[x] = entries[x].mbr;
 		}
 		return r;
+	}
+	
+	public boolean isFull()
+	{
+		for(int x = 0; x < entries.length; x++)
+		{
+			if(entries[x] == null)
+				return false;
+		}
+		return true;
 	}
 }

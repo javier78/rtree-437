@@ -19,15 +19,15 @@ public class LeafNode extends Node
 		tuples = new Tuple[MAX_ENTRIES];
 	}
 	
-	public void addTuple(Tuple t)
+	public boolean addTuple(Tuple t)
 	{
 		for(int x = 0; x < tuples.length; x++)
 		{
 			if(tuples[x] == null)
 			{
-				//TODO: Do I need to write to disk every time I insert a tuple? Please let the answer be no.
+				//TODO: Do I need to write to disk every time I insert a tuple? Please let the answer be no. Btw, answer is no. RTree is responsible for that.
 				tuples[x] = t;
-				return;
+				return true;
 			}
 			
 			if(tuples[x].equals(t) && tuples[x].overflow == null)	//first duplicate found, create overflow page
@@ -36,14 +36,25 @@ public class LeafNode extends Node
 				OverFlowNode ofn = new OverFlowNode(nr.id);
 				ofn.addTuple(t);
 				tuples[x].overflow = nr;
-				return;
+				return true;
 			}
 			else if(tuples[x].equals(t))	//nth duplicate found, don't care where it's stored, as long as it's stored somewhere
 			{
 				OverFlowNode ofn = (OverFlowNode) Node.ReadNode(tuples[x].overflow);
 				ofn.addTuple(t);	//Tuple is not necessarily stored in this specific overflow node!
-				return;
+				return true;
 			}
 		}
+		return false;
+	}
+	
+	public boolean isFull()
+	{
+		for(int x = 0; x < tuples.length; x++)
+		{
+			if(tuples[x] == null)
+				return false;
+		}
+		return true;
 	}
 }
