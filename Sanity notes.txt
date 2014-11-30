@@ -50,3 +50,22 @@ We need access to the rectangles in the child node.
 
 What to store in an index entry:
 -The current MBR, but not an array of child rectangles
+
+On duplicates: Use overflow pages it seems. Where should this reference go? In the tuple? YES! Tuple should contain a 4 byte reference to the next leaf node (which is the overflow page). This leaf node should only contain the tuples with duplicate keys.
+
+Adding 1 reference to the Tuple class changes the calculation a bit:
+2 ints = 8 bytes (x & y)
+1 long = 8 bytes
+500 char string = 500 bytes
+1 reference to overflow page = 4 bytes
+520*2d <= 4096
+2d is still 7!
+d is still 4!
+
+back to dupicates: How are duplicates stored? Should unique keys only be stored at the leaf level, and any duplicates are stored in overflow pages? Or should we only be concerned about the last unique key entered in the leaf node, and create an overflow page once we run out of space? Opting for the former. Note: The tuple containing the reference to the overflow page also counts as an instance of the tuple!
+
+Nice assumption we can make: there will never be a null element in the tuples array in between two non null elements. What this means: As soon as a null entry is found, we can safely insert the entry into the array without a care in the world. If we find a tuple with matching x and y values, this is a duplicate and we will need to create an overflow page for it.
+
+
+Adapting bulk loading to RTree:
+-

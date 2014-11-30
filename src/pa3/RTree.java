@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
 
-public class hilbert
+public class RTree
 {
 	final private static int BITS_PER_DIM = 16;
 	static ArrayList<Tuple> hilbertValues;
+	private static int currentID;
 	public static void main(String[] args) throws FileNotFoundException
 	{
 		hilbertValues = new ArrayList<Tuple>(30000);
@@ -20,9 +21,11 @@ public class hilbert
 			int y = sc.nextInt();
 			hilbertValues.add(new Tuple(x, y, getHilbertValue(x, y)));
 		}
+		currentID = -1;
 		Collections.sort(hilbertValues);
 		System.out.println("Done sorting!");
 		System.out.println(hilbertValues.size());
+		sc.close();
 	}
 	
 	public static long getHilbertValue(int x1, int x2) {
@@ -45,5 +48,11 @@ public class hilbert
 			res += h << (2 * ix);
 		}
 		return res;
+	}
+	
+	public static int getNewID()
+	{
+		currentID++;
+		return currentID;
 	}
 }

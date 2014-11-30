@@ -1,9 +1,5 @@
 package pa3;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 public class Tuple implements Comparable<Tuple>, Serializable
@@ -15,6 +11,7 @@ public class Tuple implements Comparable<Tuple>, Serializable
 	final int x;
 	final int y;
 	final long hilbert;
+	NodeReference overflow;
 	final String desc;
 
 	public Tuple(int x, int y, long hilbert)
@@ -30,28 +27,14 @@ public class Tuple implements Comparable<Tuple>, Serializable
 	{
 		return (int)(hilbert - o.hilbert);
 	}
-	/*
-	public void writeTuple(Tuple t, NodeReference tr)
+	
+	public boolean equals(Object o)
 	{
-		try {
-			FileOutputStream fos = new FileOutputStream("db/" + tr.id + ".ser");
-			ObjectOutputStream ois = new ObjectOutputStream(fos);
-			ois.writeObject(t);
-			ois.close();
-			fos.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Can't write to file!");
-			e.printStackTrace();
-		}
-		catch (IOException ioe)
-		{
-			System.out.println("Can't write object to file!");
-			ioe.printStackTrace();
-		}
+		if(!(o instanceof Tuple))
+			return false;
 		
+		Tuple t = (Tuple) o;
+		
+		return t.x == this.x && t.y == this.y;
 	}
-	*/
-	
-	
 }

@@ -14,6 +14,12 @@ public abstract class Node implements Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = 6812172449270115395L;
+	int id;
+	
+	public Node(int id)
+	{
+		this.id = id;
+	}
 
 	public static void writeNode(Node n, NodeReference nr)
 	{
