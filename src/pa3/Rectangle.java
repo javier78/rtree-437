@@ -54,5 +54,12 @@ public class Rectangle implements Serializable
 	{
 		return x1 <= x && x <= x2 && y1 <= y && y <= y2;
 	}
+	
+	public boolean intersects(Rectangle r)
+	{
+		java.awt.Rectangle rect1 = new java.awt.Rectangle(r.x1, r.y1, r.x2, r.y2);
+		java.awt.Rectangle rect2 = new java.awt.Rectangle(this.x1, this.y1, this.x2, this.y2);
+		return rect1.intersects(rect2);
+	}
 
 }

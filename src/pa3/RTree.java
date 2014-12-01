@@ -30,12 +30,13 @@ public class RTree
 		System.out.println(hilbertValues.size());
 		sc.close();
 		bulkLoad();
-		System.out.println(pointSearch(2563,8967, root).size());
+		//System.out.println(pointSearch(2563,8967, root).size());
+		System.out.println(regionSearch(new Rectangle(5649,7415,5649,7415), root).size());
 	}
 	
 	public static void bulkLoad()
 	{
-		Queue<NodeReference> childrenToBe = new LinkedList<NodeReference>();	//Giant array that will be used for next level up.
+		Queue<NodeReference> childrenToBe = new LinkedList<NodeReference>();
 		while(!hilbertValues.isEmpty())
 		{
 			int id = RTree.getNewID();
@@ -101,7 +102,6 @@ public class RTree
 					resultSet.addAll(pointSearch(x, y, Node.ReadNode(e.child)));	//Overlapping boxes can be a huge problem. We need a way to distinguish whether the point has been added or not.
 				}
 			}
-			
 		}
 		
 		else if(toSearch instanceof LeafNode)
@@ -116,13 +116,47 @@ public class RTree
 				{
 					resultSet.add(t);
 					if(t.overflow != null)
-					{
 						resultSet.addAll(t.getAllOverFlowTuples());
-					}
 				}
 			}
 		}
 		
+		return resultSet;
+	}
+	
+	public static ArrayList<Tuple> regionSearch(Rectangle searchBox, Node toSearch)
+	{
+		ArrayList<Tuple> resultSet = new ArrayList<Tuple>();
+		if(toSearch instanceof IndexNode)
+		{
+			IndexNode in = (IndexNode) toSearch;
+			
+			for(Entry e : in.entries)
+			{
+				if(e == null)
+					break;
+				if(e.mbr.intersects(searchBox))
+				{
+					resultSet.addAll(regionSearch(searchBox, Node.ReadNode(e.child)));
+				}
+			}
+		}
+		else if(toSearch instanceof LeafNode)
+		{
+			LeafNode ln = (LeafNode) toSearch;
+			
+			for(Tuple t : ln.tuples)
+			{
+				if(t == null)
+					break;
+				if(searchBox.containsPoint(t.x, t.y))
+				{
+					resultSet.add(t);
+					if(t.overflow != null)
+						resultSet.addAll(t.getAllOverFlowTuples());
+				}
+			}
+		}
 		return resultSet;
 	}
 	
