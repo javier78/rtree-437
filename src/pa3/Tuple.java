@@ -1,6 +1,7 @@
 package pa3;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Tuple implements Comparable<Tuple>, Serializable
 {
@@ -36,5 +37,23 @@ public class Tuple implements Comparable<Tuple>, Serializable
 		Tuple t = (Tuple) o;
 		
 		return t.x == this.x && t.y == this.y;
+	}
+	
+	public ArrayList<Tuple> getAllOverFlowTuples()
+	{
+		ArrayList<Tuple> t = new ArrayList<Tuple>();
+		NodeReference curr = overflow;
+		while(curr != null)
+		{
+			OverFlowNode ofn = (OverFlowNode)Node.ReadNode(overflow);
+			for(Tuple tuple : ofn.tuples)
+			{
+				if(tuple == null)
+					return t;
+				t.add(tuple);
+			}
+			curr = ofn.overflow;
+		}
+		return t;
 	}
 }

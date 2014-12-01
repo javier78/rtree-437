@@ -1,7 +1,13 @@
 package pa3;
 
-public class Rectangle 
+import java.io.Serializable;
+
+public class Rectangle implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4559993740503751530L;
 	int x1, x2, y1, y2;
 	
 	public Rectangle(int x1, int y1, int x2, int y2)
@@ -44,6 +50,9 @@ public class Rectangle
 		this.y2 = y2;
 	}
 	
-	
+	public boolean containsPoint(int x, int y)
+	{
+		return x1 <= x && x <= x2 && y1 <= y && y <= y2;
+	}
 
 }

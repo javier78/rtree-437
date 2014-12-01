@@ -21,6 +21,8 @@ public class LeafNode extends Node
 	
 	public boolean addTuple(Tuple t)
 	{
+		if(t == null)
+			System.out.println("Inserting a null tuple!?");
 		for(int x = 0; x < tuples.length; x++)
 		{
 			if(tuples[x] == null)

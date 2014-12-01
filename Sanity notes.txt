@@ -67,5 +67,45 @@ back to dupicates: How are duplicates stored? Should unique keys only be stored 
 Nice assumption we can make: there will never be a null element in the tuples array in between two non null elements. What this means: As soon as a null entry is found, we can safely insert the entry into the array without a care in the world. If we find a tuple with matching x and y values, this is a duplicate and we will need to create an overflow page for it.
 
 
-Adapting bulk loading to RTree:
--
+Recursive part of bulk loading RTree:
+-Create the leaf node and insert entries until limit is reached.
+-Once leaf limit is reached, create entry in parent node.
+-Once the index limit is reached in immediate parent node, don't split! Instead, create a new parent node and insert a new entry into this parent node (calculate MBR and stuff) and create a new child for the next leaf pages.
+-Keep on creating children in this index node until it fills. Then go up one level and see if another child node can be made in that node.
+
+
+
+New approach:
+
+Create all leaf nodes (make sure to write them to disk before continuing on to the index nodes), and have an array of NodeReferences that corresponds to these leaf nodes. Now, start creating index nodes in the next level. Calculate MBR, and use NodeReference array to connect entries in index node to leaf nodes. Keep on creating these index nodes (make sure to write these to disk as well!) until the end of the NodeReference array is reached. While creating these index nodes, keep track of the NodeReferences in another array. So, the idea with indexing is to utilize the array of child nodes so we can connect the current level of nodes to their children, and to add NodeReferences to array so that the next level up can connect to the current level. Once the root node is reached, this means that the NodeReference array constructed in the previous iteration will fit in one node. If one node is created, then the bulk loading process is complete and the DB can be searched.
+
+
+
+
+Searching: 
+Maybe use recursion? 
+
+
+
+Duplicates in the dataset: 
+2655,3665
+4156,3150
+76,2308
+718,9917
+7747,5298
+3660,4597
+4930,4959
+5782,3077
+7107,106
+926,5918
+9338,1957
+
+
+
+
+
+
+
+
+
+

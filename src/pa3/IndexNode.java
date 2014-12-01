@@ -41,6 +41,8 @@ public class IndexNode extends Node
 		Rectangle[] r = new Rectangle[entries.length];	//TODO: This assumes that all entries have rectangles. This is not always the case.
 		for(int x = 0; x < entries.length; x++)
 		{
+			if(entries[x] == null)
+				return r;
 			r[x] = entries[x].mbr;
 		}
 		return r;
@@ -51,7 +53,9 @@ public class IndexNode extends Node
 		for(int x = 0; x < entries.length; x++)
 		{
 			if(entries[x] == null)
+			{
 				return false;
+			}
 		}
 		return true;
 	}

@@ -14,6 +14,7 @@ public class RTree
 	final private static int BITS_PER_DIM = 16;
 	static PriorityQueue<Tuple> hilbertValues;
 	private static int currentID;
+	static IndexNode root;
 	public static void main(String[] args) throws FileNotFoundException
 	{
 		hilbertValues = new PriorityQueue<Tuple>();
@@ -26,29 +27,103 @@ public class RTree
 			hilbertValues.add(new Tuple(x, y, getHilbertValue(x, y)));
 		}
 		currentID = -1;
-		System.out.println("Done sorting!");
 		System.out.println(hilbertValues.size());
 		sc.close();
 		bulkLoad();
+		System.out.println(pointSearch(2563,8967, root).size());
 	}
 	
 	public static void bulkLoad()
 	{
-		ArrayList<NodeReference> leaves = new ArrayList<NodeReference>(30000);	//Giant array that will be used for next level up.
-		while(hilbertValues.size() > 0)
+		Queue<NodeReference> childrenToBe = new LinkedList<NodeReference>();	//Giant array that will be used for next level up.
+		while(!hilbertValues.isEmpty())
 		{
 			int id = RTree.getNewID();
-			leaves.add(new NodeReference(id));
+			NodeReference nr = new NodeReference(id);
+			childrenToBe.add(nr);
 			LeafNode lf = new LeafNode(id);
 			while(!lf.isFull())
 			{
-				if(hilbertValues.size() == 0)
+				if(hilbertValues.isEmpty())
 					break;
 				lf.addTuple(hilbertValues.poll());
 			}
-			Node.writeNode(lf, leaves.get(leaves.size() - 1));
+			Node.writeNode(lf, nr);
 		}
-		System.out.println("Leaf references: "+leaves.size());
+		//Leaf nodes now generated, start generating index nodes.
+		boolean complete = false;
+		while(!complete)
+		{
+			Queue<NodeReference> currentLevel = new LinkedList<NodeReference>();	//This should actually be childrenToBe, maybe reassign childrenToBe to this when it's empty!
+			while(!childrenToBe.isEmpty())
+			{
+				int id = RTree.getNewID();
+				NodeReference nr = new NodeReference(id);
+				currentLevel.add(nr);
+				IndexNode in = new IndexNode(id);
+				while(!in.isFull())
+				{
+					if(childrenToBe.isEmpty())
+					{
+						if(currentLevel.size() == 1)
+							complete = true;	//This is only set when a node that is currently being filled (but isn't full yet) and the children list is empty and there is only one node in the current level. This isn't the only place we should be checking.
+						break;
+					}
+					//Next line takes care of entry creation and calculates the MBR for this node.
+					in.addIndex(Node.ReadNode(childrenToBe.poll()));	//During this time, in could've become full, AND childrenToBe could be empty. Next conditional accounts for this.
+				}
+				Node.writeNode(in, nr);
+				if(currentLevel.size() == 1 && childrenToBe.isEmpty())	//This means that only one node has been written in this level. That would be the root.
+					complete = true;
+			}
+			childrenToBe = currentLevel;
+			System.out.println("Size of childrenToBe: "+childrenToBe.size());
+		}
+		System.out.println("Done loading nodes!");
+		IndexNode root = (IndexNode) Node.ReadNode(childrenToBe.poll());
+		System.out.println(root.isFull());
+		RTree.root = root;
+	}
+	
+	public static ArrayList<Tuple> pointSearch(int x, int y, Node toSearch)
+	{
+		ArrayList<Tuple> resultSet = new ArrayList<Tuple>();
+		if(toSearch instanceof IndexNode)
+		{
+			IndexNode in = (IndexNode) toSearch;
+			
+			for(Entry e : in.entries)
+			{
+				if(e == null)
+					break;
+				if(e.mbr.containsPoint(x, y))
+				{
+					resultSet.addAll(pointSearch(x, y, Node.ReadNode(e.child)));	//Overlapping boxes can be a huge problem. We need a way to distinguish whether the point has been added or not.
+				}
+			}
+			
+		}
+		
+		else if(toSearch instanceof LeafNode)
+		{
+			LeafNode ln = (LeafNode) toSearch;
+			
+			for(Tuple t : ln.tuples)
+			{
+				if(t == null)
+					break;
+				if(t.x == x && t.y == y)
+				{
+					resultSet.add(t);
+					if(t.overflow != null)
+					{
+						resultSet.addAll(t.getAllOverFlowTuples());
+					}
+				}
+			}
+		}
+		
+		return resultSet;
 	}
 	
 	public static long getHilbertValue(int x1, int x2) {

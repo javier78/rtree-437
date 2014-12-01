@@ -28,6 +28,8 @@ public class Entry implements Serializable
 		{
 			for(Tuple t : ((LeafNode) child).tuples)
 			{
+				if(t == null)
+					break;
 				minX = t.x < minX ? t.x : minX;
 				minY = t.y < minY ? t.y : minY;
 				
@@ -40,6 +42,8 @@ public class Entry implements Serializable
 			Rectangle[] mbrs = ((IndexNode) child).getRectangles();
 			for(Rectangle r : mbrs)
 			{
+				if(r == null)
+					break;
 				minX = r.getX1() < minX ? r.getX1() : minX;
 				minX = r.getX2() < minX ? r.getX2() : minX;
 				minY = r.getY1() < minY ? r.getY1() : minY;
