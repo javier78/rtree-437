@@ -169,9 +169,7 @@ public class RTree
 				if(e == null)
 					break;
 				if(e.mbr.containsPoint(x, y))
-				{
-					resultSet.addAll(pointSearch(x, y, Node.readNode(e.child)));	//Overlapping boxes can be a huge problem. We need a way to distinguish whether the point has been added or not.
-				}
+					resultSet.addAll(pointSearch(x, y, Node.readNode(e.child)));
 			}
 		}
 
@@ -207,9 +205,7 @@ public class RTree
 				if(e == null)
 					break;
 				if(e.mbr.intersects(searchBox))
-				{
 					resultSet.addAll(regionSearch(searchBox, Node.readNode(e.child)));
-				}
 			}
 		}
 		else if(toSearch instanceof LeafNode)
