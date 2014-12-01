@@ -1,11 +1,8 @@
 package pa3;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
@@ -22,15 +19,17 @@ public class RTree
 		File f = new File("db/");
 		if(f.isDirectory() && f.list().length > 0)	//Cleans up previous DB files
 		{
+			System.out.println("Previous database found, deleting...");
 			for(String file : f.list())
 			{
 				File toDelete = new File("db/" + file);
 				toDelete.delete();
 			}
 		}
-		
+		else if(!f.exists())
+			f.mkdir();
+		System.out.println("Just a moment...");
 		initValues();
-
 		Node.resetCount();
 		int choice = 0;
 		while(choice != 3)
