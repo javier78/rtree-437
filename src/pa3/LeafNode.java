@@ -39,7 +39,7 @@ public class LeafNode extends Node
 			}
 			else if(tuples[x].equals(t))	//nth duplicate found, don't care where it's stored, as long as it's stored somewhere
 			{
-				OverFlowNode ofn = (OverFlowNode) Node.ReadNode(tuples[x].overflow);
+				OverFlowNode ofn = (OverFlowNode) Node.readNode(tuples[x].overflow);
 				ofn.addTuple(t);	//Tuple is not necessarily stored in this specific overflow node!
 				return true;
 			}

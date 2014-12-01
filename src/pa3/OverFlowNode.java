@@ -41,7 +41,7 @@ public class OverFlowNode extends LeafNode
 		}
 		else
 		{
-			OverFlowNode ofn = (OverFlowNode)Node.ReadNode(overflow);
+			OverFlowNode ofn = (OverFlowNode)Node.readNode(overflow);
 			ofn.addTuple(t);
 			return true;
 		}

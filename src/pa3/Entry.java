@@ -62,7 +62,7 @@ public class Entry implements Serializable
 	
 	public Rectangle calculateMBR()
 	{
-		Node n = Node.ReadNode(child);
+		Node n = Node.readNode(child);
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
 		int minY = Integer.MAX_VALUE;

@@ -42,7 +42,7 @@ public abstract class Node implements Serializable
 		}
 	}
 	
-	public static Node ReadNode(NodeReference nr)
+	public static Node readNode(NodeReference nr)
 	{
 		Node read = null;
 		try {

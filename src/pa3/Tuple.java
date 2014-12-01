@@ -45,7 +45,7 @@ public class Tuple implements Comparable<Tuple>, Serializable
 		NodeReference curr = overflow;
 		while(curr != null)
 		{
-			OverFlowNode ofn = (OverFlowNode)Node.ReadNode(overflow);
+			OverFlowNode ofn = (OverFlowNode)Node.readNode(overflow);
 			for(Tuple tuple : ofn.tuples)
 			{
 				if(tuple == null)

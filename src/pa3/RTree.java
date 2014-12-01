@@ -139,7 +139,7 @@ public class RTree
 						break;
 					}
 					//Next line takes care of entry creation and calculates the MBR for this node.
-					in.addIndex(Node.ReadNode(childrenToBe.poll()));	//During this time, in could've become full, AND childrenToBe could be empty. Next conditional accounts for this.
+					in.addIndex(Node.readNode(childrenToBe.poll()));	//During this time, in could've become full, AND childrenToBe could be empty. Next conditional accounts for this.
 				}
 				Node.writeNode(in, nr);
 				if(currentLevel.size() == 1 && childrenToBe.isEmpty())	//This means that only one node has been written in this level. That would be the root.
@@ -153,7 +153,7 @@ public class RTree
 		System.out.println("Writes: " + Node.writeCount);
 		System.out.println("Total: " + (Node.readCount + Node.writeCount));
 		Node.resetCount();
-		IndexNode root = (IndexNode) Node.ReadNode(childrenToBe.poll());
+		IndexNode root = (IndexNode) Node.readNode(childrenToBe.poll());
 		RTree.root = root;
 	}
 
@@ -170,7 +170,7 @@ public class RTree
 					break;
 				if(e.mbr.containsPoint(x, y))
 				{
-					resultSet.addAll(pointSearch(x, y, Node.ReadNode(e.child)));	//Overlapping boxes can be a huge problem. We need a way to distinguish whether the point has been added or not.
+					resultSet.addAll(pointSearch(x, y, Node.readNode(e.child)));	//Overlapping boxes can be a huge problem. We need a way to distinguish whether the point has been added or not.
 				}
 			}
 		}
@@ -208,7 +208,7 @@ public class RTree
 					break;
 				if(e.mbr.intersects(searchBox))
 				{
-					resultSet.addAll(regionSearch(searchBox, Node.ReadNode(e.child)));
+					resultSet.addAll(regionSearch(searchBox, Node.readNode(e.child)));
 				}
 			}
 		}
