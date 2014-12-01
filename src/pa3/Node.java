@@ -15,7 +15,8 @@ public abstract class Node implements Serializable
 	 */
 	private static final long serialVersionUID = 6812172449270115395L;
 	int id;
-	
+	transient static int readCount = 0;
+	transient static int writeCount = 0;
 	public Node(int id)
 	{
 		this.id = id;
@@ -29,8 +30,8 @@ public abstract class Node implements Serializable
 			oos.writeObject(n);
 			oos.close();
 			fos.close();
+			writeCount++;
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Can't write to file!");
 			e.printStackTrace();
 		}
@@ -49,19 +50,23 @@ public abstract class Node implements Serializable
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			read = (Node)ois.readObject();
 			ois.close();
+			readCount++;
 		} catch (FileNotFoundException e) 
 		{
-			// TODO Auto-generated catch block
 			System.out.println("Couldn't find node file!");
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Couldn't open object input stream!");
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return read;
+	}
+	
+	public static void resetCount()
+	{
+		readCount = 0;
+		writeCount = 0;
 	}
 }

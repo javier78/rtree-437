@@ -21,13 +21,10 @@ public class LeafNode extends Node
 	
 	public boolean addTuple(Tuple t)
 	{
-		if(t == null)
-			System.out.println("Inserting a null tuple!?");
 		for(int x = 0; x < tuples.length; x++)
 		{
 			if(tuples[x] == null)
 			{
-				//TODO: Do I need to write to disk every time I insert a tuple? Please let the answer be no. Btw, answer is no. RTree is responsible for that.
 				tuples[x] = t;
 				return true;
 			}

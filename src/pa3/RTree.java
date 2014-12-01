@@ -1,6 +1,7 @@
 package pa3;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -17,23 +18,91 @@ public class RTree
 	static IndexNode root;
 	public static void main(String[] args) throws FileNotFoundException
 	{
-		hilbertValues = new PriorityQueue<Tuple>();
-		Scanner sc = new Scanner(new File("project3dataset30K-1.txt"));
-		sc.useDelimiter(",\\s*|\\s+");
-		while(sc.hasNext())
+		Scanner kb = new Scanner(System.in);
+		File f = new File("db/");
+		if(f.isDirectory() && f.list().length > 0)	//Cleans up previous DB files
 		{
-			int x = sc.nextInt();
-			int y = sc.nextInt();
-			hilbertValues.add(new Tuple(x, y, getHilbertValue(x, y)));
+			for(String file : f.list())
+			{
+				File toDelete = new File("db/" + file);
+				toDelete.delete();
+			}
 		}
-		currentID = -1;
-		System.out.println(hilbertValues.size());
-		sc.close();
-		bulkLoad();
-		//System.out.println(pointSearch(2563,8967, root).size());
-		System.out.println(regionSearch(new Rectangle(5649,7415,5649,7415), root).size());
+		
+		initValues();
+
+		Node.resetCount();
+		int choice = 0;
+		while(choice != 3)
+		{
+			System.out.println("1. Point query");
+			System.out.println("2. Region query");
+			System.out.println("3. Quit");
+			choice = kb.nextInt();
+			ArrayList<Tuple> results;
+			switch(choice)
+			{
+			case 1:
+				System.out.println("Enter coordinate in this format: x y");
+				int x = kb.nextInt();
+				int y = kb.nextInt();
+				results = pointSearch(x, y, root);
+				System.out.println("Result count: " + results.size());
+				System.out.println("Results: ");
+
+				for(Tuple t : results)
+					System.out.println(t.x + " "+t.y);
+
+				System.out.println("Disk reads: " + Node.readCount);
+				Node.resetCount();
+				break;
+			case 2:
+				System.out.println("Enter rectangle coordinates in this format: x1 y1 x2 y2");
+				int x1 = kb.nextInt();
+				int y1 = kb.nextInt();
+				int x2 = kb.nextInt();
+				int y2 = kb.nextInt();
+				results = regionSearch(new Rectangle(x1, y1, x2, y2), root);
+
+				System.out.println("Result count: " + results.size());
+				System.out.println("Results: ");
+
+				for(Tuple t : results)
+					System.out.println(t.x + " "+t.y);
+
+				System.out.println("Disk reads: " + Node.readCount);
+				Node.resetCount();
+				break;
+			case 3: 
+				System.out.println("Goodbye!");
+				kb.close();
+				return;
+			}
+		}
 	}
-	
+
+	public static void initValues()
+	{
+		hilbertValues = new PriorityQueue<Tuple>();
+		Scanner sc;
+		try {
+			sc = new Scanner(new File("project3dataset30K-1.txt"));
+			sc.useDelimiter(",\\s*|\\s+");
+			while(sc.hasNext())
+			{
+				int x = sc.nextInt();
+				int y = sc.nextInt();
+				hilbertValues.add(new Tuple(x, y, getHilbertValue(x, y)));
+			}
+			currentID = -1;
+			sc.close();
+			bulkLoad();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	public static void bulkLoad()
 	{
 		Queue<NodeReference> childrenToBe = new LinkedList<NodeReference>();
@@ -78,21 +147,24 @@ public class RTree
 					complete = true;
 			}
 			childrenToBe = currentLevel;
-			System.out.println("Size of childrenToBe: "+childrenToBe.size());
+			//System.out.println("Size of childrenToBe: "+childrenToBe.size());
 		}
-		System.out.println("Done loading nodes!");
+		System.out.println("Database built!");
+		System.out.println("Reads: " + Node.readCount);
+		System.out.println("Writes: " + Node.writeCount);
+		System.out.println("Total: " + (Node.readCount + Node.writeCount));
+		Node.resetCount();
 		IndexNode root = (IndexNode) Node.ReadNode(childrenToBe.poll());
-		System.out.println(root.isFull());
 		RTree.root = root;
 	}
-	
+
 	public static ArrayList<Tuple> pointSearch(int x, int y, Node toSearch)
 	{
 		ArrayList<Tuple> resultSet = new ArrayList<Tuple>();
 		if(toSearch instanceof IndexNode)
 		{
 			IndexNode in = (IndexNode) toSearch;
-			
+
 			for(Entry e : in.entries)
 			{
 				if(e == null)
@@ -103,11 +175,11 @@ public class RTree
 				}
 			}
 		}
-		
+
 		else if(toSearch instanceof LeafNode)
 		{
 			LeafNode ln = (LeafNode) toSearch;
-			
+
 			for(Tuple t : ln.tuples)
 			{
 				if(t == null)
@@ -120,17 +192,17 @@ public class RTree
 				}
 			}
 		}
-		
+
 		return resultSet;
 	}
-	
+
 	public static ArrayList<Tuple> regionSearch(Rectangle searchBox, Node toSearch)
 	{
 		ArrayList<Tuple> resultSet = new ArrayList<Tuple>();
 		if(toSearch instanceof IndexNode)
 		{
 			IndexNode in = (IndexNode) toSearch;
-			
+
 			for(Entry e : in.entries)
 			{
 				if(e == null)
@@ -144,7 +216,7 @@ public class RTree
 		else if(toSearch instanceof LeafNode)
 		{
 			LeafNode ln = (LeafNode) toSearch;
-			
+
 			for(Tuple t : ln.tuples)
 			{
 				if(t == null)
@@ -159,15 +231,15 @@ public class RTree
 		}
 		return resultSet;
 	}
-	
+
 	public static long getHilbertValue(int x1, int x2) {
 		long res = 0;
-		
+
 		for (int ix = BITS_PER_DIM - 1; ix >= 0; ix--) {
 			long h = 0;
 			long b1 = (x1 & (1 << ix)) >> ix;
 			long b2 = (x2 & (1 << ix)) >> ix;
-			
+
 			if (b1 == 0 && b2 == 0) {
 				h = 0;
 			} else if (b1 == 0 && b2 == 1) {
@@ -181,7 +253,7 @@ public class RTree
 		}
 		return res;
 	}
-	
+
 	public static int getNewID()
 	{
 		currentID++;

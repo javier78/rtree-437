@@ -38,7 +38,7 @@ public class IndexNode extends Node
 	
 	public Rectangle[] getRectangles()
 	{
-		Rectangle[] r = new Rectangle[entries.length];	//TODO: This assumes that all entries have rectangles. This is not always the case.
+		Rectangle[] r = new Rectangle[entries.length];
 		for(int x = 0; x < entries.length; x++)
 		{
 			if(entries[x] == null)
